@@ -63,7 +63,7 @@ def translate_pix(xpix_rot, ypix_rot, xpos, ypos, scale):
 
 # Define a function to apply rotation and translation (and clipping)
 # Once you define the two functions above this function should work
-def pix_to_world(xpix, ypix, xpos, ypos, yaw, world_size, scale):
+def pix_to_world(xpix, ypix, xpos, ypos, yaw, world_size, scale, max_distance):
     # Apply rotation
     xpix_rot, ypix_rot = rotate_pix(xpix, ypix, yaw)
     # Apply translation
@@ -71,8 +71,11 @@ def pix_to_world(xpix, ypix, xpos, ypos, yaw, world_size, scale):
     # Perform rotation, translation and clipping all at once
     x_pix_world = np.clip(np.int_(xpix_tran), 0, world_size - 1)
     y_pix_world = np.clip(np.int_(ypix_tran), 0, world_size - 1)
+    # Limit the points to a max distance
+    dist, _ = to_polar_coords(xpix, ypix)
+    nearby = dist < max_distance * 10
     # Return the result
-    return x_pix_world, y_pix_world
+    return x_pix_world[nearby], y_pix_world[nearby]
 
 # Define a function to perform a perspective transform
 def perspect_transform(img, src, dst):
@@ -81,7 +84,6 @@ def perspect_transform(img, src, dst):
     warped = cv2.warpPerspective(img, M, (img.shape[1], img.shape[0]))# keep same size as input image
     
     return warped
-
 
 # Apply the above functions in succession and update the Rover state accordingly
 def perception_step(Rover):
@@ -121,13 +123,14 @@ def perception_step(Rover):
 
     # 6) Convert rover-centric pixel values to world coordinates
     xpos, ypos = Rover.pos
-    x_world_nav, y_world_nav = pix_to_world(xpix_nav, ypix_nav, xpos, ypos, Rover.yaw, world_size, scale)
-    x_world_rock, y_world_rock = pix_to_world(xpix_nav, ypix_nav, xpos, ypos, Rover.yaw, world_size, scale)
-    x_world_obs, y_world_obs = pix_to_world(xpix_nav, ypix_nav, xpos, ypos, Rover.yaw, world_size, scale)
+    max_distance = 5    # max distance in meters used for mapping
+    x_world_nav, y_world_nav = pix_to_world(xpix_nav, ypix_nav, xpos, ypos, Rover.yaw, world_size, scale, max_distance)
+    x_world_rock, y_world_rock = pix_to_world(xpix_rock, ypix_rock, xpos, ypos, Rover.yaw, world_size, scale, max_distance)
+    x_world_obs, y_world_obs = pix_to_world(xpix_obs, ypix_obs, xpos, ypos, Rover.yaw, world_size, scale, max_distance)
 
     # 7) Update Rover worldmap (to be displayed on right side of screen)
     # verify that roll and pitch are low to increase fidelity
-    precision_pitch, precision_roll = 0.5, 0.8
+    precision_pitch, precision_roll = 0.2, 1.2
     pitch = min(Rover.pitch, 360 - Rover.pitch)
     roll = min(Rover.roll, 360 - Rover.roll)
     if (pitch < precision_pitch) and (roll < precision_roll):

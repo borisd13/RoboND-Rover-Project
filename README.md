@@ -20,7 +20,7 @@ Here below we can see the steps from the camera of the rover:
 ![alt text](misc/project_example.PNG "Project example")
 
 ### Projection of rover capture to world map
-Once the pixels were identified in the local coordinates of the rover, we used its position to project them towards the world map and identify the coordinates of explored area, using different colors for rocks, ground, and obstacles.
+Once the pixels were identified in the local coordinates of the rover, we used their position to project them towards the world map and identify the coordinates of explored area, using different colors for rocks (green), ground (blue), and obstacles (red).
 
 ![alt text](misc/project_example_map.PNG "Project example map")
 
@@ -37,7 +37,7 @@ The `perception_step` function uses the camera associated to the rover and creat
 * The position and yaw of the rover are used to convert the previous local coordinates to world coordinates.
 * Those positions are used to define polar coordinates as well as updating world coordinates.
 
-**Note**: Prior to updating the world coordinates, we ensure that the roll and pitch of the rover are low. It improves greatly the mapping accuracy.
+**Note**: Prior to updating the world coordinates, we ensure that the roll and pitch of the rover are low. We also ensure that the points are not too far. It improves greatly the mapping accuracy.
 
 ### Explanation of `decision_step()` function
 The `decision_step` function uses the processing performed in the previous perception step to decide what action the rover needs to take. It respects the following logic:
