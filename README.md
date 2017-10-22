@@ -17,12 +17,12 @@ Here below we can see the steps from the camera of the rover:
 - after that filters are used to identify ground, rocks and obstacles
 - finally they are projected towards the local coordinates associated to the rover and mean direction is extracted
 
-![alt text](misc\project_example.png "Project example")
+![alt text](misc/project_example.png "Project example")
 
 ### Projection of rover capture to world map
 Once the pixels were identified in the local coordinates of the rover, we used its position to project them towards the world map and identify the coordinates of explored area, using different colors for rocks, ground, and obstacles.
 
-![alt text](misc\project_example_map.png "Project example map")
+![alt text](misc/project_example_map.png "Project example map")
 
 ---
 
@@ -65,4 +65,4 @@ Here are potential improvements that could be made:
 * We should decide which areas to explore based on the previously visited areas.
 * We should ensure that we visit each border of the map by ensuring that all sides are limited by some obstacles.
 
-![alt text](misc\autonomous_navigation.png "Autonomous navigation")
+![alt text](misc/autonomous_navigation.png "Autonomous navigation")
